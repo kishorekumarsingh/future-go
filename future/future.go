@@ -1,6 +1,7 @@
 package future
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -29,6 +30,7 @@ func (task *Task) Running() bool {
 
 // Cancel the task if possible.
 func (task *Task) Cancel() {
+	fmt.Println("Cancelling task ...")
 	task.lock.Lock()
 	task.shouldStop = true
 	task.lock.Unlock()
@@ -36,6 +38,7 @@ func (task *Task) Cancel() {
 	case <-task.StopChan():
 	case <-time.After(5 * time.Second):
 	}
+	task.result = "INTERRUPTED"
 }
 
 // Done returns true if the task was cancelled or finished executing.
@@ -112,5 +115,24 @@ func Submit(f func(url string, timeout time.Duration) interface{}, url string, t
 		return nil
 	})
 	task.wg.Wait()
+	return task
+}
+
+// PrintInt runs the function as a goroutine and returns an interruptable task.
+func PrintInt() *Task {
+	task := GetSetMega(func(shouldStop S) interface{} {
+	out:
+		for {
+			for i := 0; i < 10; i++ {
+				time.Sleep(1 * time.Second)
+				fmt.Println(i)
+				if shouldStop() {
+					break out
+				}
+			}
+			break out
+		}
+		return nil
+	})
 	return task
 }

@@ -1,0 +1,6 @@
+1.  Making the future.Submit() more versatile so that functions with different number of 
+    parameters and types can also be executed without changing/adding any code. 
+    Since golang doesn't support method overloading, a workaround needs to be implemented. 
+
+2.  Defining multiple different states for the task might be more meaningful. At present, only 
+    one state is being used.
